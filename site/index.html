@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SFL Planner — Combo Maker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Micro+5&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/icons/skills/green-thumb.png">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+<!-- ============================= HEADER ============================= -->
+<header class="topo">
+  <div class="topo-esq">
+    <h1 class="marca">🌻 SFL<span class="marca-sub">Planner</span></h1>
+    <div class="seletor-idioma">
+      <select id="sel-idioma" title="Idioma / Language">
+        <option value="pt">Português</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <span class="versao" id="versao-site"></span>
+  </div>
+
+  <div class="topo-centro">
+    <div class="flower-live" id="flower-live" title="FLOWER em tempo real (CoinGecko + sfl.world)">
+      <span class="flower-dot" id="flower-dot"></span>
+      <span class="flower-simbolo">🌸 FLOWER</span>
+      <span class="flower-preco" id="flower-usd">—</span>
+      <span class="flower-preco flower-brl" id="flower-brl"></span>
+    </div>
+  </div>
+
+  <div class="topo-dir">
+    <a class="link-market" href="https://sunflower-land.com/play/#/marketplace/hot" target="_blank" rel="noopener" data-i18n="header.market">Market do jogo ↗</a>
+    <a class="link-market" href="https://wiki.sfl.world/en/home" target="_blank" rel="noopener">Wiki ↗</a>
+  </div>
+</header>
+
+<!-- ============================= NAV ============================= -->
+<nav class="nav-paginas">
+  <button class="nav-item ativo">🏠 <span data-i18n="nav.combo">Combo Maker</span></button>
+  <button class="nav-item bloqueado" title="Fase 2">🌾 Crop to Coins</button>
+  <button class="nav-item bloqueado" title="Fase 2">🏝️ <span data-i18n="nav.expansao">Expansão</span></button>
+</nav>
+
+<!-- ============================= FARM LOOKUP ============================= -->
+<section class="linha-farm">
+  <label for="input-farm" data-i18n="farm.inserir">Inserir Farm:</label>
+  <input id="input-farm" type="number" placeholder="Ex: 3661" min="1">
+  <button id="btn-farm" class="btn-acao" data-i18n="farm.pesquisar">Pesquisar</button>
+  <span class="loader oculto" id="farm-loader"></span>
+  <span class="farm-resumo" id="farm-resumo"></span>
+  <span class="aviso-offline oculto" id="aviso-offline" data-i18n="farm.offline">⚠ APIs indisponíveis — modo manual</span>
+</section>
+
+<!-- ============================= PLANNER (tabs + cartão) ============================= -->
+<main class="fila-planner">
+
+  <div class="caixa-tabs">
+    <div class="tabs-principais" id="tabs-principais">
+      <button class="tab-btn ativo" data-tab="tab-skills">Skills</button>
+      <button class="tab-btn" data-tab="tab-nivel" data-i18n="tab.nivel">Bumpkin Level</button>
+      <button class="tab-btn bloqueado" title="Fase 2">Collectibles</button>
+      <button class="tab-btn bloqueado" title="Fase 2">Wearables</button>
+      <button class="tab-btn bloqueado" title="Fase 2">Buds</button>
+    </div>
+
+    <!-- ------- TAB SKILLS ------- -->
+    <section class="tab-conteudo ativo" id="tab-skills">
+      <div class="skills-cabecalho">
+        <h2 data-i18n="skills.titulo">Skills — Tier 1 · 2 · 3</h2>
+        <div class="pontos-medidor" id="pontos-medidor"></div>
+      </div>
+      <div class="sub-tabs" id="sub-tabs-arvores"><!-- gerado por skills.js --></div>
+      <div id="conteudo-arvore"><!-- gerado por skills.js --></div>
+    </section>
+
+    <!-- ------- TAB BUMPKIN LEVEL ------- -->
+    <section class="tab-conteudo" id="tab-nivel">
+      <h2 data-i18n="nivel.titulo">Bumpkin Level</h2>
+      <div class="nivel-grid">
+        <div class="campo">
+          <label for="input-xp" data-i18n="nivel.xp">XP atual:</label>
+          <input id="input-xp" type="number" min="0" placeholder="0">
+        </div>
+        <div id="nivel-resultado" class="nivel-resultado"></div>
+      </div>
+      <div id="nivel-tabela"></div>
+    </section>
+  </div>
+
+  <!-- ------- CARTÃO DE INFO ------- -->
+  <aside class="cartao" id="cartao-info">
+    <div class="cartao-vazio" id="cartao-vazio" data-i18n="cartao.dica">Passa o rato ou clica numa skill para ver os detalhes</div>
+    <div class="cartao-corpo oculto" id="cartao-corpo">
+      <div class="cartao-icone" id="cartao-icone"></div>
+      <h3 class="cartao-titulo" id="cartao-titulo"></h3>
+      <div class="cartao-badges" id="cartao-badges"></div>
+      <p class="cartao-descricao" id="cartao-descricao"></p>
+      <div class="cartao-ranks" id="cartao-ranks"></div>
+      <div class="cartao-custos" id="cartao-custos"></div>
+      <div class="cartao-delta" id="cartao-delta"></div>
+    </div>
+  </aside>
+
+</main>
+
+<!-- ============================= STATUS DA FARM ============================= -->
+<section class="linha-status">
+  <div class="campo">
+    <label for="sel-ilha" data-i18n="status.ilha">Tipo de Ilha:</label>
+    <select id="sel-ilha">
+      <option value="basic">Basic</option>
+      <option value="spring">Petal/Spring</option>
+      <option value="desert">Desert</option>
+      <option value="volcano">Volcano</option>
+      <option value="swamp">Swamp</option>
+    </select>
+  </div>
+  <div class="campo">
+    <label for="sel-estacao" data-i18n="status.estacao">Estação:</label>
+    <select id="sel-estacao">
+      <option value="spring" data-i18n="estacao.primavera">Primavera</option>
+      <option value="summer" data-i18n="estacao.verao">Verão</option>
+      <option value="autumn" data-i18n="estacao.outono">Outono</option>
+      <option value="winter" data-i18n="estacao.inverno">Inverno</option>
+    </select>
+  </div>
+  <div class="campo">
+    <label for="input-nivel" data-i18n="status.nivel">Nível Bumpkin:</label>
+    <input id="input-nivel" type="number" min="1" max="200" placeholder="1">
+  </div>
+  <div class="campo">
+    <label for="input-flower-coins" title="Quantos coins vale 1 FLOWER no teu jogo" data-i18n="status.flowerCoins">Coins por 1 FLOWER:</label>
+    <input id="input-flower-coins" type="number" min="0" step="any" placeholder="auto">
+  </div>
+  <button class="btn-acao btn-secundario" id="btn-limpar" data-i18n="status.limpar">Limpar seleção</button>
+</section>
+
+<!-- ============================= RESULTADO DO COMBO ============================= -->
+<section class="accordion" id="accordion-combo">
+  <button class="accordion-cab" id="accordion-btn">
+    📊 <span data-i18n="combo.titulo">Resultado do Combo Completo</span>
+    <span class="accordion-seta">▼</span>
+  </button>
+  <div class="accordion-corpo" id="accordion-corpo">
+    <div class="combo-controles">
+      <label data-i18n="combo.ver">Visualizar:</label>
+      <div class="segmento" id="seg-periodo">
+        <button data-periodo="dia" class="ativo" data-i18n="combo.dia">Dia</button>
+        <button data-periodo="semana" data-i18n="combo.semana">Semana</button>
+        <button data-periodo="mes" data-i18n="combo.mes">Mês</button>
+      </div>
+    </div>
+    <div id="combo-resultado"></div>
+    <h3 class="titulo-secao" data-i18n="combo.lista">🛒 Que skill comprar primeiro? (ganho ÷ custo)</h3>
+    <div id="lista-compras"></div>
+  </div>
+</section>
+
+<!-- ============================= CALCULADORAS ============================= -->
+<div class="calc-bloco">
+  <div class="tabs-calc" id="tabs-calc">
+    <button class="tab2-btn ativo" data-calc="calc-crops">Crops</button>
+    <button class="tab2-btn" data-calc="calc-fruits" data-i18n="calc.frutas">Frutas</button>
+    <button class="tab2-btn" data-calc="calc-greenhouse">Greenhouse</button>
+    <button class="tab2-btn" data-calc="calc-minerals" data-i18n="calc.minerais">Minerais</button>
+    <button class="tab2-btn" data-calc="calc-animals" data-i18n="calc.animais">Animais</button>
+  </div>
+
+  <section class="calc-conteudo ativo" id="calc-crops">
+    <div class="calc-config">
+      <div class="campo">
+        <label for="input-plots" data-i18n="calc.plots">Qtd. de Crop Plots:</label>
+        <input id="input-plots" type="number" min="0" placeholder="Ex: 70">
+      </div>
+      <div class="campo">
+        <label for="sel-crop-ativo" data-i18n="calc.cropAtivo">Crop para o combo:</label>
+        <select id="sel-crop-ativo"><option value="auto">Auto (melhor)</option></select>
+      </div>
+    </div>
+    <div id="tabela-crops"></div>
+  </section>
+
+  <section class="calc-conteudo" id="calc-fruits">
+    <div class="calc-config">
+      <div class="campo">
+        <label for="input-fruit-patches" data-i18n="calc.patches">Qtd. de Fruit Patches:</label>
+        <input id="input-fruit-patches" type="number" min="0" placeholder="Ex: 16">
+      </div>
+      <div class="campo">
+        <label for="sel-fruit-ativa" data-i18n="calc.frutaAtiva">Fruta para o combo:</label>
+        <select id="sel-fruit-ativa"><option value="auto">Auto (melhor)</option></select>
+      </div>
+    </div>
+    <div id="tabela-fruits"></div>
+  </section>
+
+  <section class="calc-conteudo" id="calc-greenhouse">
+    <div class="calc-config">
+      <div class="campo">
+        <label for="input-gh-pots" data-i18n="calc.pots">Qtd. de Pots:</label>
+        <input id="input-gh-pots" type="number" min="0" placeholder="Ex: 4">
+      </div>
+      <div class="campo">
+        <label for="sel-gh-ativa" data-i18n="calc.ghAtiva">Cultura para o combo:</label>
+        <select id="sel-gh-ativa"><option value="auto">Auto (melhor)</option></select>
+      </div>
+    </div>
+    <div id="tabela-greenhouse"></div>
+  </section>
+
+  <section class="calc-conteudo" id="calc-minerals">
+    <div class="calc-config" id="config-minerais"><!-- inputs gerados --></div>
+    <div id="tabela-minerals"></div>
+  </section>
+
+  <section class="calc-conteudo" id="calc-animals">
+    <div class="calc-config" id="config-animais"><!-- inputs gerados --></div>
+    <div id="tabela-animals"></div>
+  </section>
+</div>
+
+<!-- ============================= RODAPÉ ============================= -->
+<footer class="rodape">
+  <span data-i18n="rodape.fan">Ferramenta fan-made, não oficial. Dados extraídos do código open-source do Sunflower Land.</span>
+  <span id="rodape-meta"></span>
+</footer>
+
+<!-- ===== dados gerados ===== -->
+<script src="data/skills.data.js"></script>
+<script src="data/skillsLegacy.data.js"></script>
+<script src="data/skillsMeta.data.js"></script>
+<script src="data/tiers.data.js"></script>
+<script src="data/crops.data.js"></script>
+<script src="data/fruits.data.js"></script>
+<script src="data/animals.data.js"></script>
+<script src="data/resources.data.js"></script>
+<script src="data/levels.data.js"></script>
+<script src="data/i18n-game.data.js"></script>
+<script src="data/icons.data.js"></script>
+<script src="data/meta.data.js"></script>
+<!-- ===== app ===== -->
+<script src="js/i18n.js"></script>
+<script src="js/state.js"></script>
+<script src="js/api.js"></script>
+<script src="js/calc/effects-map.js"></script>
+<script src="js/calc/boosts.js"></script>
+<script src="js/calc/engine.js"></script>
+<script src="js/ui/infoCard.js"></script>
+<script src="js/skills.js"></script>
+<script src="js/ui/tables.js"></script>
+<script src="js/farm.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

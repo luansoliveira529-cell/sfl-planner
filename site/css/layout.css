@@ -1,0 +1,179 @@
+/* SFL Planner — estrutura da página */
+
+/* ---------- header ---------- */
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 6px 4px 14px;
+  border-bottom: 2px solid var(--dourado-esc);
+  margin-bottom: 12px;
+}
+
+.topo-esq { display: flex; align-items: center; gap: 14px; }
+
+.marca {
+  font-family: var(--fonte-pixel);
+  font-size: 46px;
+  font-weight: 400;
+  color: var(--laranja);
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+.marca-sub { color: #fff; font-size: 30px; }
+
+.versao { color: var(--texto-2); font-size: 12px; }
+
+.flower-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--painel);
+  border: 1px solid var(--dourado-esc);
+  border-radius: 20px;
+  padding: 6px 14px;
+  box-shadow: var(--sombra);
+}
+
+.flower-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #666;
+}
+
+.flower-dot.vivo { background: var(--verde); box-shadow: 0 0 6px var(--verde); animation: pulsar 2s infinite; }
+
+@keyframes pulsar { 50% { opacity: .5; } }
+
+.flower-preco { font-weight: 600; color: var(--laranja-claro); }
+.flower-brl { color: var(--texto-2); font-weight: 400; font-size: 13px; }
+
+.topo-dir { display: flex; gap: 14px; }
+.link-market { font-size: 13px; text-decoration: none; }
+.link-market:hover { text-decoration: underline; }
+
+/* ---------- nav ---------- */
+.nav-paginas { display: flex; gap: 6px; margin-bottom: 14px; }
+
+.nav-item {
+  background: var(--painel);
+  color: var(--laranja);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 14px;
+}
+
+.nav-item.ativo { background: var(--laranja); color: #241a08; font-weight: 600; }
+.nav-item.bloqueado { opacity: .4; cursor: not-allowed; }
+
+/* ---------- farm lookup ---------- */
+.linha-farm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  color: var(--laranja);
+  font-weight: 600;
+}
+
+.linha-farm input { width: 110px; }
+
+.farm-resumo { color: var(--verde); font-weight: 400; }
+.aviso-offline { color: var(--vermelho); font-weight: 400; }
+
+/* ---------- planner ---------- */
+.fila-planner {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.caixa-tabs { flex: 1; min-width: 0; }
+
+.cartao {
+  width: 300px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 14px;
+  background: linear-gradient(180deg, var(--castanho-1), var(--castanho-2));
+  border: 3px solid var(--dourado);
+  border-radius: 12px;
+  box-shadow: var(--sombra), inset 0 0 12px rgba(208, 162, 90, .18);
+  padding: 16px;
+  min-height: 220px;
+}
+
+/* ---------- status ---------- */
+.linha-status, .calc-config {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+.campo { display: flex; flex-direction: column; gap: 4px; }
+.campo label { color: var(--laranja); font-weight: 600; font-size: 13px; }
+.campo input { width: 130px; }
+
+/* ---------- accordion ---------- */
+.accordion { margin: 18px 0; }
+
+.accordion-cab {
+  width: 100%;
+  text-align: left;
+  background: linear-gradient(180deg, var(--painel-2), var(--painel));
+  color: var(--laranja);
+  font-size: 16px;
+  font-weight: 600;
+  border: 2px solid var(--dourado-esc);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.accordion-seta { transition: transform .2s; }
+.accordion.aberto .accordion-seta { transform: rotate(180deg); }
+
+.accordion-corpo {
+  display: none;
+  border: 2px solid var(--dourado-esc);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 14px 16px;
+  background: var(--painel);
+}
+
+.accordion.aberto .accordion-corpo { display: block; }
+
+.combo-controles { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: var(--laranja); font-weight: 600; }
+
+/* ---------- calculadoras ---------- */
+.calc-bloco { margin-top: 8px; }
+
+/* ---------- rodapé ---------- */
+.rodape {
+  margin-top: 40px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+  color: var(--texto-2);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ---------- responsivo ---------- */
+@media (max-width: 980px) {
+  .fila-planner { flex-direction: column; }
+  .cartao { width: 100%; position: static; }
+  body { padding: 12px 12px 40px; }
+}
