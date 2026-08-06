@@ -8,6 +8,9 @@
  *   /api/sfl/landinfo/<id>  -> sfl.world/api/v1/land/info/farm_id/<id>
  *
  * A API key vem da variavel de ambiente SFL_API_KEY do Netlify e nunca chega ao browser.
+ *
+ * Sem cabecalhos CORS de proposito: o site e servido do mesmo dominio, por isso
+ * nao precisa deles, e a ausencia impede que outros sites usem este proxy (e a chave).
  */
 
 const BROWSER_UA =
@@ -26,7 +29,6 @@ function json(status, corpo) {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": "*",
       "Cache-Control": "no-store",
     },
   });
@@ -55,20 +57,13 @@ async function fetchUpstream(url, headers, ttl) {
   return { status, corpo };
 }
 
-/* O redirect do netlify.toml pode entregar o pedido como /api/... ou como
-   /.netlify/functions/api/... — normaliza para "/farm/123", "/sfl/prices", etc. */
-function rota(pathname) {
-  return pathname
-    .replace(/^\/\.netlify\/functions\/api/, "")
-    .replace(/^\/api/, "");
-}
-
 export default async (req) => {
-  const path = rota(new URL(req.url).pathname);
+  // config.path entrega o caminho original; tira o prefixo /api para casar as rotas
+  const path = new URL(req.url).pathname.replace(/^\/api/, "");
 
   let m = /^\/farm\/(\d{1,10})$/.exec(path);
   if (m) {
-    const key = process.env.SFL_API_KEY;
+    const key = Netlify.env.get("SFL_API_KEY");
     if (!key) {
       return json(500, JSON.stringify({
         error: "SFL_API_KEY em falta nas variaveis de ambiente do Netlify",
@@ -121,4 +116,8 @@ export default async (req) => {
   }
 
   return json(404, JSON.stringify({ error: "endpoint desconhecido" }));
+};
+
+export const config = {
+  path: "/api/*",
 };

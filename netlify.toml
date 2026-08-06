@@ -2,8 +2,11 @@
 # O site e estatico (site/) e os endpoints /api/* sao servidos pela funcao
 # netlify/functions/api.mjs, que substitui o proxy do server.py.
 #
+# A rota /api/* e declarada na propria funcao (export const config), por isso
+# aqui nao ha redirects.
+#
 # Antes do primeiro deploy, define no painel do Netlify:
-#   Site configuration > Environment variables > SFL_API_KEY = a tua API key
+#   Project configuration > Environment variables > SFL_API_KEY = a tua API key
 
 [build]
   publish = "site"
@@ -11,9 +14,3 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-
-# Mantem os mesmos caminhos do server.py, para o site/js/api.js nao mudar.
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200

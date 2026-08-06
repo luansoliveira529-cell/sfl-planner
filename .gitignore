@@ -2,3 +2,5 @@ config.local.json
 .env
 __pycache__/
 *.pyc
+.netlify/
+node_modules/
