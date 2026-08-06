@@ -50,11 +50,13 @@ window.App = window.App || {};
     var t = App.t;
     var html = '<table class="tabela"><tr><th>' + t("recurso") + "</th><th>" + t("nos") +
       "</th><th>" + t("ciclosDia") + "</th><th>" + t("producaoDia") + "</th><th>" +
-      t("precoP2P") + ' 🌸</th><th>' + t("flowerDia") + "</th><th></th></tr>";
+      t("precoP2P") + ' 🌸</th><th>' + t("flowerDia") + "</th><th>" + t("custoFerr") +
+      "</th><th></th></tr>";
     lista.forEach(function (r) {
       html += "<tr><td>" + r.nome + "</td><td>" + r.nos + "</td><td>" + F(r.ciclos) +
         "</td><td>" + F(r.unidades) + "</td><td>" + (r.preco ? F(r.preco) : "—") +
-        '</td><td class="pos">' + F(r.flower) + '</td><td><a href="' + MARKET +
+        '</td><td class="pos">' + F(r.flower) + '</td><td class="neg">-' +
+        F(r.custoCoins) + " (" + (r.ferramenta || "—") + ')</td><td><a href="' + MARKET +
         '" target="_blank" rel="noopener">' + t("marketLink") + "</a></td></tr>";
     });
     document.getElementById("tabela-minerals").innerHTML = html + "</table>";
@@ -64,11 +66,12 @@ window.App = window.App || {};
     var t = App.t;
     var html = '<table class="tabela"><tr><th>' + t("animal") + "</th><th>" + t("quantos") +
       "</th><th>" + t("producao") + "/dia</th><th>" + t("precoP2P") + ' 🌸</th><th>' +
-      t("flowerDia") + "</th><th></th></tr>";
+      t("flowerDia") + "</th><th>" + t("racao") + "</th><th></th></tr>";
     lista.forEach(function (r) {
       html += "<tr><td>" + r.nome + " (" + r.produto + ")</td><td>" + r.qtd + "</td><td>" +
         F(r.producao) + "</td><td>" + (r.preco ? F(r.preco) : "—") +
-        '</td><td class="pos">' + F(r.flower) + '</td><td><a href="' + MARKET +
+        '</td><td class="pos">' + F(r.flower) + '</td><td class="neg">-' +
+        F(r.custoCoins) + '</td><td><a href="' + MARKET +
         '" target="_blank" rel="noopener">' + t("marketLink") + "</a></td></tr>";
     });
     document.getElementById("tabela-animals").innerHTML = html + "</table>";

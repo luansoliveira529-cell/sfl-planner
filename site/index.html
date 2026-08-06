@@ -65,9 +65,9 @@
     <div class="tabs-principais" id="tabs-principais">
       <button class="tab-btn ativo" data-tab="tab-skills">Skills</button>
       <button class="tab-btn" data-tab="tab-nivel" data-i18n="tab.nivel">Bumpkin Level</button>
-      <button class="tab-btn bloqueado" title="Fase 2">Collectibles</button>
-      <button class="tab-btn bloqueado" title="Fase 2">Wearables</button>
-      <button class="tab-btn bloqueado" title="Fase 2">Buds</button>
+      <button class="tab-btn" data-tab="tab-collectibles">Collectibles</button>
+      <button class="tab-btn" data-tab="tab-wearables">Wearables</button>
+      <button class="tab-btn" data-tab="tab-buds">Buds</button>
     </div>
 
     <!-- ------- TAB SKILLS ------- -->
@@ -78,6 +78,23 @@
       </div>
       <div class="sub-tabs" id="sub-tabs-arvores"><!-- gerado por skills.js --></div>
       <div id="conteudo-arvore"><!-- gerado por skills.js --></div>
+    </section>
+
+    <!-- ------- TABS NFTs ------- -->
+    <section class="tab-conteudo" id="tab-collectibles">
+      <h2>Collectibles</h2>
+      <p class="tier-info" data-i18n="nft.aviso"></p>
+      <div id="lista-collectibles"></div>
+    </section>
+    <section class="tab-conteudo" id="tab-wearables">
+      <h2>Wearables</h2>
+      <p class="tier-info" data-i18n="nft.aviso"></p>
+      <div id="lista-wearables"></div>
+    </section>
+    <section class="tab-conteudo" id="tab-buds">
+      <h2>Buds</h2>
+      <p class="tier-info" data-i18n="nft.aviso"></p>
+      <div id="lista-buds"></div>
     </section>
 
     <!-- ------- TAB BUMPKIN LEVEL ------- -->
@@ -255,6 +272,7 @@
 <script src="js/ui/infoCard.js"></script>
 <script src="js/skills.js"></script>
 <script src="js/ui/tables.js"></script>
+<script src="js/nfts.js"></script>
 <script src="js/farm.js"></script>
 <script src="js/main.js"></script>
 </body>

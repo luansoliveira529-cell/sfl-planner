@@ -145,6 +145,7 @@ window.App = window.App || {};
     App.sincronizarInputsNodos();
     App.renderTudoSkills();
     App.renderNivel();
+    App.renderNfts();
 
     /* dados ao vivo */
     App.iniciarFlowerTicker();

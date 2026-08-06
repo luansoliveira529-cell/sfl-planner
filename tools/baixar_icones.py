@@ -55,18 +55,53 @@ def baixar(item):
     return name, None
 
 
+def caminhos_de_item(item):
+    """Caminhos prováveis no repo para a imagem de um item do jogo."""
+    baixo = item.lower().replace(" ", "_")
+    return [
+        f"assets/crops/{baixo}/crop.png",
+        f"assets/fruit/{baixo}.png",
+        f"assets/resources/{baixo}.png",
+        f"assets/sfts/{baixo}.png",
+        f"assets/icons/{baixo}.png",
+    ]
+
+
+def baixar_item(item):
+    dest = OUT_ICONS / f"item-{slug(item)}.png"
+    if dest.exists() and dest.stat().st_size > 100:
+        return dest.name
+    for path in caminhos_de_item(item):
+        try:
+            req = urllib.request.Request(RAW + path, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=20, context=_CTX) as r:
+                data = r.read()
+            if len(data) > 100:
+                dest.write_bytes(data)
+                return dest.name
+        except Exception:
+            continue
+    return None
+
+
 def main():
     OUT_ICONS.mkdir(parents=True, exist_ok=True)
     tarefas = []
+    itens = []
     for name, s in skills.items():
         ic = s.get("icon")
         if ic and ic.get("type") == "file":
             tarefas.append((name, ic["path"]))
+        elif ic and ic.get("type") == "item" and ic.get("item"):
+            itens.append((name, ic["item"]))
 
-    print(f"A descarregar {len(tarefas)} icones...")
+    print(f"A descarregar {len(tarefas)} icones de skill + {len(itens)} de item...")
     mapa = {}
     with ThreadPoolExecutor(max_workers=8) as ex:
         for name, fname in ex.map(baixar, tarefas):
+            if fname:
+                mapa[name] = fname
+        for (name, _), fname in zip(itens, ex.map(lambda p: baixar_item(p[1]), itens)):
             if fname:
                 mapa[name] = fname
 

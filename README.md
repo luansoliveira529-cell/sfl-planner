@@ -84,6 +84,24 @@ de um proxy, que o GitHub não executa. Há dois modos suportados:
 - **No teu PC** → `iniciar.bat` (o `server.py` faz de servidor e de proxy).
 - **Online** → Netlify (ver abaixo), com a mesma lógica em função serverless.
 
+## ✅ Checklist para quem gere o deploy no Netlify
+
+Estado atual conhecido (2026-08-06): o site publicado tem 3 problemas, todos
+resolvidos do lado do deploy — o código nesta pasta já está certo:
+
+1. **Farm não carrega** → a variável `SFL_API_KEY` nunca foi criada no painel
+   do Netlify. Criar em *Site configuration > Environment variables* com a API
+   key do jogo (a mesma do `config.local.json`) e fazer redeploy. A função já
+   devolve o erro exato: `SFL_API_KEY em falta`.
+2. **Ícones todos partidos (404)** → o deploy que está no ar não incluiu
+   `site/assets/icons/skills/*.png` (provável deploy manual de pasta
+   incompleta). Fazer o deploy **a partir do repositório Git** (os 81 PNG estão
+   commitados) e confirmar depois:
+   `curl -I https://SITE.netlify.app/assets/icons/skills/green-thumb.png` → 200.
+   Mesmo que falte algum, o site agora cai para emoji em vez de imagem partida.
+3. **Custos não descontavam** → já corrigido no código (ferramentas nos
+   minerais, ração nos animais); entra no próximo deploy.
+
 ## Pôr online no Netlify
 
 O `netlify.toml` e o `netlify/functions/api.mjs` já estão no repositório. A

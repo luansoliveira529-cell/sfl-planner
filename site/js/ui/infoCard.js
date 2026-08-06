@@ -11,13 +11,18 @@ window.App = window.App || {};
   App.emojiArvore = function (tree) { return EMOJI_ARVORE[tree] || "✨"; };
 
   App.iconeHTML = function (nome, tamanho) {
+    var s = SFL_DATA.skills[nome];
+    var emoji = App.emojiArvore(s ? s.tree : "");
     var f = SFL_DATA.icons[nome];
     if (f) {
+      /* onerror: se o PNG faltar no deploy, cai para o emoji da árvore
+         em vez de mostrar imagem partida */
       return '<img class="icone-pixel" src="assets/icons/skills/' + f + '" alt="" width="' +
-        (tamanho || 34) + '" height="' + (tamanho || 34) + '">';
+        (tamanho || 34) + '" height="' + (tamanho || 34) +
+        '" onerror="this.outerHTML=\'<span class=&quot;emoji-fallback&quot;>' +
+        emoji + '</span>\'">';
     }
-    var s = SFL_DATA.skills[nome];
-    return '<span class="emoji-fallback">' + App.emojiArvore(s ? s.tree : "") + "</span>";
+    return '<span class="emoji-fallback">' + emoji + "</span>";
   };
 
   /* formata o efeito de um rank consoante o kind */

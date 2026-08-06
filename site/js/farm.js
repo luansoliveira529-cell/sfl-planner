@@ -58,6 +58,22 @@ window.App = window.App || {};
       st.nodes.cows = contarAnimais(farm.barn, "Cow");
       st.nodes.sheep = contarAnimais(farm.barn, "Sheep");
 
+      /* NFTs: collectibles colocados (terreno + casa), wearables e buds */
+      var col = {};
+      [farm.collectibles, farm.home && farm.home.collectibles].forEach(function (fonte) {
+        if (!fonte) return;
+        Object.keys(fonte).forEach(function (nome) {
+          var n = Array.isArray(fonte[nome]) ? fonte[nome].length : 1;
+          col[nome] = (col[nome] || 0) + n;
+        });
+      });
+      st.nfts = {
+        collectibles: col,
+        equipped: (b.equipped && typeof b.equipped === "object") ? b.equipped : {},
+        wardrobe: farm.wardrobe || {},
+        buds: farm.buds || {}
+      };
+
       /* UI */
       document.getElementById("sel-ilha").value = st.island;
       document.getElementById("sel-estacao").value = st.season;
@@ -78,6 +94,7 @@ window.App = window.App || {};
       App.save();
       App.renderTudoSkills();
       App.renderNivel();
+      App.renderNfts();
       loader.classList.add("oculto");
     }).catch(function (e) {
       /* upstream lento/rate-limit: tenta 1x mais passados 2.5s */

@@ -74,6 +74,29 @@ class Parser:
 
     # ------------------------------------------------------------ strings
 
+    def _fim_balanceado(self, abre, fecha):
+        """Indice logo apos o fecho balanceado a partir de self.i (que aponta ao abre).
+        Ignora aberturas/fechos dentro de strings."""
+        i = self.i
+        prof = 0
+        while i < self.n:
+            c = self.s[i]
+            if c in "\"'`":
+                q = c
+                i += 1
+                while i < self.n and self.s[i] != q:
+                    i += 2 if self.s[i] == "\\" else 1
+                i += 1
+                continue
+            if c == abre:
+                prof += 1
+            elif c == fecha:
+                prof -= 1
+                if prof == 0:
+                    return i + 1
+            i += 1
+        self.error(f"'{abre}' sem fecho")
+
     def parse_string(self):
         q = self.s[self.i]
         self.i += 1
@@ -205,6 +228,18 @@ class Parser:
         if c == "[":
             return self.parse_array()
         if c == "(":
+            fim = self._fim_balanceado("(", ")")
+            resto = self.s[fim:fim + 8].lstrip()
+            if resto.startswith("=>"):
+                # arrow function: (args) => corpo — devolve o corpo se for literal
+                self.i = fim
+                self.skip_ws()
+                self.eat("=>")
+                self.skip_ws()
+                if self.s.startswith("{", self.i) and not self.s.startswith("({", self.i):
+                    self.i = self._fim_balanceado("{", "}")
+                    return None
+                return self.parse_expr()
             self.i += 1
             v = self.parse_expr()
             self.eat(")")
@@ -492,6 +527,9 @@ def extrair_gamedata():
     res_src = read("resources.ts")
     commodities = clean(parse_export(res_src, "COMMODITIES"))
 
+    tools_src = read("tools.ts")
+    tools = clean(parse_export(tools_src, "WORKBENCH_TOOLS"))
+
     write_datajs("crops.data.js", "crops", {
         "crops": crops, "seeds": crop_seeds,
         "greenhouseCrops": gh_crops, "greenhouseSeeds": gh_seeds,
@@ -506,6 +544,11 @@ def extrair_gamedata():
     write_datajs("resources.data.js", "resources", {
         "recovery": {k: v for k, v in rec.items()},
         "commodities": commodities,
+        "tools": tools,
+        # ferramenta usada por recurso (1 por ciclo de colheita)
+        "toolPorRecurso": {"Wood": "Axe", "Stone": "Pickaxe", "Iron": "Stone Pickaxe",
+                           "Gold": "Iron Pickaxe", "Crimstone": "Gold Pickaxe",
+                           "Oil": "Oil Drill"},
         # yields base por no' (fonte: wiki + eventos do jogo; modo manual)
         "baseYield": {"Tree": 1, "Stone Rock": 1, "Iron Rock": 1,
                       "Gold Rock": 1, "Crimstone Rock": 1, "Oil Reserve": 10},

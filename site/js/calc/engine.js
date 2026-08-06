@@ -99,9 +99,13 @@ window.App = window.App || {};
 
   var YIELD_BASE = { Wood: 1, Stone: 1, Iron: 1, Gold: 1, Crimstone: 1, Oil: 10 };
   var REC_FALLBACK = { OIL_RESERVE_RECOVERY_TIME: 20 * 3600 };
+  /* ferramentas gastas por ciclo de colheita (arvore = 3 machadadas) */
+  var TOOLS_POR_CICLO = { Wood: 3 };
 
   App.calcularMinerais = function (mods) {
     var out = [];
+    var ferrPorRec = SFL_DATA.resources.toolPorRecurso || {};
+    var tools = SFL_DATA.resources.tools || {};
     MINERAIS.forEach(function (mdef) {
       var nos = App.state.farm.nodes[mdef.chave] | 0;
       var rec = SFL_DATA.resources.recovery[mdef.rec] || REC_FALLBACK[mdef.rec] || DIA;
@@ -109,9 +113,14 @@ window.App = window.App || {};
       var ciclos = DIA / (rec * dm.respawnMult);
       var unidades = nos * ciclos * (YIELD_BASE[mdef.item] + dm.yieldAdd);
       var preco = App.precoP2P(mdef.item);
+      var ferramenta = ferrPorRec[mdef.item];
+      var precoFerr = (tools[ferramenta] && tools[ferramenta].price) || 0;
+      var custoDia = nos * ciclos * (TOOLS_POR_CICLO[mdef.item] || 1) *
+        precoFerr * dm.toolCostMult;
       out.push({
         nome: mdef.rotulo, item: mdef.item, nos: nos, ciclos: ciclos,
-        unidades: unidades, preco: preco, flower: unidades * preco
+        unidades: unidades, preco: preco, flower: unidades * preco,
+        ferramenta: ferramenta, custoCoins: custoDia
       });
     });
     return out;
@@ -124,17 +133,41 @@ window.App = window.App || {};
     { tipo: "Sheep", chave: "sheep", produto: "Wool", horas: 24 }
   ];
 
+  /* custo da racao mais barata, em coins/unidade: ingredientes x preco de venda
+     do crop (custo de oportunidade de crafta-la) */
+  function custoRacaoUnidade() {
+    var foods = (SFL_DATA.animals && SFL_DATA.animals.foods) || {};
+    var crops = SFL_DATA.crops.crops;
+    var melhor = 0;
+    Object.keys(foods).forEach(function (nome) {
+      var f = foods[nome];
+      if (f.type !== "food" || !f.ingredients) return;
+      var custo = 0;
+      Object.keys(f.ingredients).forEach(function (ing) {
+        var c = crops[ing];
+        custo += (f.ingredients[ing] || 0) * ((c && c.sellPrice) || 0);
+      });
+      if (custo > 0 && (melhor === 0 || custo < melhor)) melhor = custo;
+    });
+    return melhor;
+  }
+
+  var RACOES_POR_DIA = 3; // aproximacao: 3 unidades de racao por animal por dia
+
   App.calcularAnimais = function (mods) {
     var out = [];
+    var custoUnid = custoRacaoUnidade();
     ANIMAIS_DEF.forEach(function (a) {
       var qtd = App.state.farm.nodes[a.chave] | 0;
       var am = mods.animals;
       var ciclosDia = (DIA / (a.horas * 3600 * am.cycleMult));
       var producao = qtd * ciclosDia * (1 + am.produceAdd + am.produceAddPor[a.tipo]);
       var preco = App.precoP2P(a.produto);
+      var racaoDia = qtd * RACOES_POR_DIA * custoUnid * am.feedCostMult;
       out.push({
         nome: a.tipo, produto: a.produto, qtd: qtd,
-        producao: producao, preco: preco, flower: producao * preco
+        producao: producao, preco: preco, flower: producao * preco,
+        custoCoins: racaoDia
       });
     });
     return out;
@@ -167,8 +200,8 @@ window.App = window.App || {};
       clamp0(ghAtiva ? ghAtiva.liquido : 0);
 
     var flowerDia = 0;
-    minerais.forEach(function (r) { flowerDia += r.flower; });
-    animais.forEach(function (r) { flowerDia += r.flower; });
+    minerais.forEach(function (r) { flowerDia += r.flower; coinsDia -= r.custoCoins; });
+    animais.forEach(function (r) { flowerDia += r.flower; coinsDia -= r.custoCoins; });
 
     var taxa = App.state.prices.flowerCoins; // coins por 1 FLOWER
     var flowerTotalDia = flowerDia + (taxa > 0 ? coinsDia / taxa : 0);
