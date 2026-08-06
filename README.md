@@ -63,6 +63,29 @@ https://github.com/sunflower-land/sunflower-land e volta a correr.)
 - Custos de ferramentas (picaretas/machados) e Crop Machine ficam para a fase 2,
   tal como Collectibles/Wearables/Buds e a calculadora de expansão de ilha.
 
+## Usar noutro PC (clonar do GitHub)
+
+```
+git clone https://github.com/luansoliveira529-cell/sfl-planner.git
+cd sfl-planner
+copy config.example.json config.local.json
+:: edita config.local.json e cola a tua API key
+iniciar.bat
+```
+
+Requisito único: Python 3 instalado.
+
+## ⚠ O GitHub não corre o site
+
+O GitHub só **guarda o código**. Abrir o site "a partir do GitHub" (Pages ou
+ficheiros raw) NÃO funciona por inteiro: o lookup da farm e os preços precisam
+do `server.py` (proxy), que o GitHub não executa. Para usar o site:
+
+- **No teu PC** → `iniciar.bat` (funciona tudo, é o modo suportado).
+- **Online/público** → fase 2: Netlify/Vercel com as duas funções proxy e a
+  API key em variável de ambiente. Só o preço do FLOWER (CoinGecko) funciona
+  sem servidor.
+
 ## Publicar mais tarde (fase 2)
 
 O site é estático — para pôr online (Netlify/Vercel) basta servir `site/` e
