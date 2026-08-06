@@ -79,15 +79,34 @@ Requisito único: Python 3 instalado.
 
 O GitHub só **guarda o código**. Abrir o site "a partir do GitHub" (Pages ou
 ficheiros raw) NÃO funciona por inteiro: o lookup da farm e os preços precisam
-do `server.py` (proxy), que o GitHub não executa. Para usar o site:
+de um proxy, que o GitHub não executa. Há dois modos suportados:
 
-- **No teu PC** → `iniciar.bat` (funciona tudo, é o modo suportado).
-- **Online/público** → fase 2: Netlify/Vercel com as duas funções proxy e a
-  API key em variável de ambiente. Só o preço do FLOWER (CoinGecko) funciona
-  sem servidor.
+- **No teu PC** → `iniciar.bat` (o `server.py` faz de servidor e de proxy).
+- **Online** → Netlify (ver abaixo), com a mesma lógica em função serverless.
 
-## Publicar mais tarde (fase 2)
+## Pôr online no Netlify
 
-O site é estático — para pôr online (Netlify/Vercel) basta servir `site/` e
-recriar os 2 endpoints do proxy (`/api/farm/*`, `/api/sfl/*`) como funções
-serverless, com a API key numa variável de ambiente.
+O `netlify.toml` e o `netlify/functions/api.mjs` já estão no repositório. A
+função serverless espelha os endpoints do `server.py`, por isso o site é o
+mesmo nos dois modos — nada muda no `site/js/api.js`.
+
+1. No Netlify: **Add new site > Import an existing project** e escolhe o repo
+   `sfl-planner`. O `netlify.toml` já traz o `publish` e as funções — não é
+   preciso configurar build.
+2. **Antes do primeiro deploy**, em *Site configuration > Environment
+   variables*, cria `SFL_API_KEY` com a tua API key do jogo.
+3. Deploy. A partir daí, cada `git push` para `main` republica sozinho.
+
+Se saltares o passo 2, o site abre e o preço do FLOWER funciona, mas o lookup
+da farm devolve `SFL_API_KEY em falta`.
+
+| Onde | Chave da API |
+|---|---|
+| PC local | `config.local.json` (fora do git) |
+| Netlify | variável de ambiente `SFL_API_KEY` |
+
+⚠ Um site Netlify é **público**: qualquer pessoa com o URL pode consultar farms
+através do teu proxy, e portanto da tua API key (a chave em si nunca é
+exposta, mas o consumo conta para ti). O cache da função e o rate limit do
+Netlify seguram o uso normal; se te preocupar, mantém o URL só para ti ou
+protege o site com password (funcionalidade paga do Netlify).
