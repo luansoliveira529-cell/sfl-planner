@@ -84,23 +84,28 @@ de um proxy, que o GitHub não executa. Há dois modos suportados:
 - **No teu PC** → `iniciar.bat` (o `server.py` faz de servidor e de proxy).
 - **Online** → Netlify (ver abaixo), com a mesma lógica em função serverless.
 
-## ✅ Checklist para quem gere o deploy no Netlify
+## ✅ Estado do deploy (verificado a 2026-08-06)
 
-Estado atual conhecido (2026-08-06): o site publicado tem 3 problemas, todos
-resolvidos do lado do deploy — o código nesta pasta já está certo:
+Site: https://legendary-pithivier-53f9ca.netlify.app — a publicar de `main`,
+a partir do repositório Git.
 
-1. **Farm não carrega** → a variável `SFL_API_KEY` nunca foi criada no painel
-   do Netlify. Criar em *Site configuration > Environment variables* com a API
-   key do jogo (a mesma do `config.local.json`) e fazer redeploy. A função já
-   devolve o erro exato: `SFL_API_KEY em falta`.
-2. **Ícones todos partidos (404)** → o deploy que está no ar não incluiu
-   `site/assets/icons/skills/*.png` (provável deploy manual de pasta
-   incompleta). Fazer o deploy **a partir do repositório Git** (os 81 PNG estão
-   commitados) e confirmar depois:
-   `curl -I https://SITE.netlify.app/assets/icons/skills/green-thumb.png` → 200.
-   Mesmo que falte algum, o site agora cai para emoji em vez de imagem partida.
-3. **Custos não descontavam** → já corrigido no código (ferramentas nos
-   minerais, ração nos animais); entra no próximo deploy.
+| Verificação | Estado |
+|---|---|
+| `/` | ✅ 200 |
+| `/api/sfl/prices` (função serverless) | ✅ 200 com preços reais |
+| `/assets/icons/skills/*.png` | ✅ 200 — os 81 ícones estão publicados |
+| `/api/farm/<id>` | ❌ 500 — falta a `SFL_API_KEY` |
+
+**Falta só um passo:** criar `SFL_API_KEY` em *Project configuration >
+Environment variables* com a API key do jogo (a mesma do `config.local.json`)
+e refazer o deploy. Enquanto não existir, a função devolve o erro explícito
+`SFL_API_KEY em falta`.
+
+Nota para não repetir um diagnóstico errado: os ícones **nunca** estiveram
+partidos. O 404 que se via era o favicon, que apontava para
+`green-thumb.png` — um ficheiro que nunca existiu neste projeto (os ícones
+reais são `abundant-harvest.png`, `golden-touch.png`, etc.). Já corrigido.
+Para testar ícones, usar um nome que exista, não este.
 
 ## Pôr online no Netlify
 
